@@ -1,0 +1,45 @@
+---
+alwaysApply: true
+---
+# shadcn/ui Component Usage
+
+This project uses **shadcn/ui** for all UI elements and components.
+
+## Installation
+
+If shadcn/ui is not initialized in the project, use:
+
+```bash
+npx shadcn@latest init
+```
+
+## Adding Components
+
+To add a specific component that isn't installed yet, use the following command format:
+
+```bash
+npx shadcn@latest add [component-name]
+```
+
+### Examples:
+
+```bash
+npx shadcn@latest add button
+npx shadcn@latest add card
+npx shadcn@latest add input
+npx shadcn@latest add dialog
+npx shadcn@latest add form
+```
+
+## Component Location
+
+- All shadcn/ui components are located in `src/components/ui/`
+- Utility functions are in `src/lib/utils.ts`
+- The `cn()` utility function should be used for merging Tailwind classes
+
+## Guidelines
+
+- Always use shadcn/ui components for UI elements
+- Do not create custom UI components when a shadcn/ui equivalent exists
+- Components can be customized by modifying the files in `src/components/ui/`
+- Refer to the [components.json](mdc:components.json) file for project configuration

@@ -1,0 +1,119 @@
+---
+alwaysApply: true
+---
+
+# Clerk Authentication & Data Security
+
+All authentication in this project is handled by **Clerk**. It is **CRITICAL** that users can only access their own data and cannot access any data belonging to other users.
+
+## Core Security Principles
+
+1. **Always authenticate requests** - Every API route that accesses user data must verify authentication
+2. **Always filter by userId** - Every database query for user-specific data must filter by the authenticated user's ID
+3. **Never trust client input** - Never accept a userId from request parameters; always get it from Clerk's authentication
+
+## Authentication in API Routes
+
+```typescript
+import { auth } from '@clerk/nextjs/server';
+
+export async function GET(request: Request) {
+  // Get authenticated user ID from Clerk
+  const { userId } = await auth();
+  
+  // Always check if user is authenticated
+  if (!userId) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  
+  // Use userId to filter queries - NEVER use a userId from request params
+  const userDecks = await db.select()
+    .from(decksTable)
+    .where(eq(decksTable.userId, userId));
+  
+  return Response.json({ decks: userDecks });
+}
+```
+
+## Database Query Security
+
+### ✅ CORRECT - Filter by authenticated user
+
+```typescript
+const { userId } = await auth();
+
+// Get user's decks only
+const decks = await db.select()
+  .from(decksTable)
+  .where(eq(decksTable.userId, userId));
+
+// Get specific deck but verify ownership
+const [deck] = await db.select()
+  .from(decksTable)
+  .where(
+    and(
+      eq(decksTable.id, deckId),
+      eq(decksTable.userId, userId)  // CRITICAL: Always verify ownership
+    )
+  );
+```
+
+### ❌ INCORRECT - Missing user filter
+
+```typescript
+// NEVER do this - allows access to any deck
+const deck = await db.select()
+  .from(decksTable)
+  .where(eq(decksTable.id, deckId));
+
+// NEVER trust userId from request
+const userIdFromParams = request.url.searchParams.get('userId');
+// This would allow users to access other users' data!
+```
+
+## Update & Delete Operations
+
+Always verify ownership before modifying or deleting data:
+
+```typescript
+const { userId } = await auth();
+
+// Delete with ownership verification
+await db.delete(decksTable)
+  .where(
+    and(
+      eq(decksTable.id, deckId),
+      eq(decksTable.userId, userId)  // Ensures user can only delete their own decks
+    )
+  );
+```
+
+## Joining Tables
+
+When joining tables, ensure the root table is filtered by userId:
+
+```typescript
+const { userId } = await auth();
+
+// Get deck with cards - ensures user owns the deck
+const result = await db.select()
+  .from(decksTable)
+  .leftJoin(cardsTable, eq(cardsTable.deckId, decksTable.id))
+  .where(
+    and(
+      eq(decksTable.id, deckId),
+      eq(decksTable.userId, userId)  // Root table filtered by user
+    )
+  );
+```
+
+## Checklist for Every API Route
+
+- [ ] Import `auth` from `@clerk/nextjs/server`
+- [ ] Call `await auth()` to get userId
+- [ ] Check if `userId` exists (return 401 if not)
+- [ ] Filter ALL database queries by `userId`
+- [ ] Never use `userId` from request parameters or body
+- [ ] Verify ownership before update/delete operations
+
+**REMEMBER: Security is not optional. Every query must enforce user isolation.**
