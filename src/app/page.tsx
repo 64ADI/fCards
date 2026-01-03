@@ -1,10 +1,4 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
-import Link from "next/link";
-
 export default async function Home() {
-  const { userId } = await auth();
-  const user = await currentUser();
-
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="max-w-3xl mx-auto text-center">
@@ -15,25 +9,11 @@ export default async function Home() {
           Create, study, and track your progress with intelligent flashcard decks
         </p>
 
-        {userId ? (
-          <div className="space-y-4">
-            <p className="text-lg">
-              Welcome back, <span className="font-semibold">{user?.firstName || "there"}</span>!
-            </p>
-            <Link
-              href="/dashboard"
-              className="inline-block px-8 py-3 text-lg font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-            >
-              Go to Dashboard
-            </Link>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <p className="text-lg text-muted-foreground">
-              Sign in to start creating and studying your flashcards
-            </p>
-          </div>
-        )}
+        <div className="space-y-4">
+          <p className="text-lg text-muted-foreground">
+            Sign in to start creating and studying your flashcards
+          </p>
+        </div>
 
         <div className="mt-16 grid gap-8 md:grid-cols-3">
           <div className="text-center">
