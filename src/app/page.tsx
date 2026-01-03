@@ -1,3 +1,6 @@
+import { SignUpButton } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
+
 export default async function Home() {
   return (
     <div className="container mx-auto px-4 py-16">
@@ -10,8 +13,11 @@ export default async function Home() {
         </p>
 
         <div className="space-y-4">
-          <p className="text-lg text-muted-foreground">
-            Sign in to start creating and studying your flashcards
+          <p className="text-lg text-muted-foreground flex items-center justify-center gap-2 flex-wrap">
+            <SignUpButton mode="modal">
+              <Button variant="default" size="sm">Sign up</Button>
+            </SignUpButton>
+            <span>to start creating and studying your flashcards</span>
           </p>
         </div>
 

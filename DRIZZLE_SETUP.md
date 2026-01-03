@@ -10,11 +10,12 @@ fcards/
 ├── src/
 │   ├── db/
 │   │   ├── schema.ts          # Database schema definitions
-│   │   └── index.ts           # Database connection export
+│   │   ├── index.ts           # Database connection export
+│   │   └── queries/
+│   │       └── deck-queries.ts # Database query functions
 │   └── app/
-│       └── api/
-│           └── users/
-│               └── route.ts   # Example API route with CRUD operations
+│       └── dashboard/
+│           └── page.tsx       # Dashboard using query functions
 ├── drizzle.config.ts          # Drizzle Kit configuration
 ├── .env                       # Environment variables (configured)
 └── package.json               # Updated with database scripts
@@ -57,52 +58,72 @@ npm run db:studio
 
 ## 📊 Database Schema
 
-The initial schema includes a `users` table:
+The schema includes flashcard-related tables:
 
 ```typescript
-export const usersTable = pgTable("users", {
+// Decks table - represents a collection of flashcards
+export const decksTable = pgTable("decks", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  userId: varchar({ length: 255 }).notNull(), // Clerk user ID
   name: varchar({ length: 255 }).notNull(),
-  age: integer().notNull(),
-  email: varchar({ length: 255 }).notNull().unique(),
+  description: text(),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp().defaultNow().notNull(),
+});
+
+// Cards table - individual flashcards within a deck
+export const cardsTable = pgTable("cards", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  deckId: integer().notNull().references(() => decksTable.id, { onDelete: "cascade" }),
+  front: text().notNull(),
+  back: text().notNull(),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp().defaultNow().notNull(),
 });
 ```
 
 ## 💻 Usage Examples
 
-### In API Routes (Next.js App Router)
+### Database Query Functions Pattern
+
+All database operations use helper functions in `src/db/queries/`:
 
 ```typescript
+// db/queries/deck-queries.ts
 import { db } from '@/db';
-import { usersTable } from '@/db/schema';
+import { decksTable } from '@/db/schema';
+import { eq, desc, and } from 'drizzle-orm';
 
-// Select all users
-const users = await db.select().from(usersTable);
+// Fetch all decks for a user
+export async function getUserDecks(userId: string) {
+  return await db.select()
+    .from(decksTable)
+    .where(eq(decksTable.userId, userId))
+    .orderBy(desc(decksTable.updatedAt));
+}
 
-// Insert a user
-await db.insert(usersTable).values({
-  name: 'John Doe',
-  age: 30,
-  email: 'john@example.com'
-});
-
-// Update a user
-await db.update(usersTable)
-  .set({ age: 31 })
-  .where(eq(usersTable.email, 'john@example.com'));
-
-// Delete a user
-await db.delete(usersTable)
-  .where(eq(usersTable.email, 'john@example.com'));
+// Create a new deck
+export async function createDeck(userId: string, name: string, description?: string) {
+  const [newDeck] = await db.insert(decksTable)
+    .values({ userId, name, description })
+    .returning();
+  return newDeck;
+}
 ```
 
-### Example API Endpoint
+### Using in Server Components
 
-A complete CRUD API has been created at `/api/users`:
+```typescript
+// app/dashboard/page.tsx
+import { auth } from '@clerk/nextjs/server';
+import { getUserDecks } from '@/db/queries/deck-queries';
 
-- **GET** `/api/users` - Get all users
-- **POST** `/api/users` - Create a new user
-- **DELETE** `/api/users?email=user@example.com` - Delete a user
+export default async function DashboardPage() {
+  const { userId } = await auth();
+  const decks = await getUserDecks(userId);
+  // ...
+}
+```
 
 ## 📝 Next Steps
 
@@ -114,16 +135,18 @@ A complete CRUD API has been created at `/api/users`:
 
 1. Add table definition to `src/db/schema.ts`:
 ```typescript
-export const postsTable = pgTable("posts", {
+export const newTable = pgTable("new_table", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  title: varchar({ length: 255 }).notNull(),
-  content: text().notNull(),
-  userId: integer().notNull().references(() => usersTable.id),
+  userId: varchar({ length: 255 }).notNull(), // Clerk user ID
+  // ... your fields
   createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp().defaultNow().notNull(),
 });
 ```
 
-2. Push to database:
+2. Create query functions in `src/db/queries/new-queries.ts`
+
+3. Push to database:
 ```bash
 npm run db:push
 ```
@@ -141,5 +164,6 @@ npm run db:push
 - ✅ Schema created
 - ✅ Config file created
 - ✅ Schema pushed to database
-- ✅ Example API routes created
+- ✅ Query functions pattern implemented
+- ✅ Clerk authentication integrated
 

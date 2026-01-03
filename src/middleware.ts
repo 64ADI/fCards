@@ -13,8 +13,11 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.redirect(dashboardUrl);
   }
   
-  // Protect dashboard routes
-  if (isProtectedRoute(req)) await auth.protect();
+  // Protect dashboard routes - redirect to homepage if not authenticated
+  if (isProtectedRoute(req) && !userId) {
+    const homeUrl = new URL("/", req.url);
+    return NextResponse.redirect(homeUrl);
+  }
 });
 
 export const config = {
