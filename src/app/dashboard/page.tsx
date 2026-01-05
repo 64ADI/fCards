@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { getUserDecks } from "@/db/queries/deck-queries";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -93,70 +94,59 @@ export default async function DashboardPage() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {decks.map((deck) => (
-              <Card 
-                key={deck.id} 
-                className="hover:shadow-lg transition-shadow cursor-pointer"
+              <Link 
+                key={deck.id}
+                href={`/dashboard/deck/${deck.id}`}
               >
-                <CardHeader>
-                  <CardTitle className="line-clamp-1">{deck.name}</CardTitle>
-                  <CardDescription className="line-clamp-2">
-                    {deck.description || "No description"}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <svg 
-                        className="w-4 h-4" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" 
-                        />
-                      </svg>
-                      <span>0 cards</span>
+                <Card 
+                  className="hover:shadow-lg transition-shadow cursor-pointer h-full"
+                >
+                  <CardHeader>
+                    <CardTitle className="line-clamp-1">{deck.name}</CardTitle>
+                    <CardDescription className="line-clamp-2">
+                      {deck.description || "No description"}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <svg 
+                          className="w-4 h-4" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth={2} 
+                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" 
+                          />
+                        </svg>
+                        <span>0 cards</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <svg 
+                          className="w-4 h-4" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth={2} 
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" 
+                          />
+                        </svg>
+                        <span>
+                          {new Date(deck.updatedAt).toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <svg 
-                        className="w-4 h-4" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" 
-                        />
-                      </svg>
-                      <span>
-                        {new Date(deck.updatedAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="mt-4 flex gap-2">
-                    <Button 
-                      className="flex-1" 
-                      variant="default"
-                      size="sm"
-                    >
-                      Study
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                    >
-                      Edit
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         )}
