@@ -1,9 +1,12 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect, notFound } from 'next/navigation';
 import { getDeckWithCards } from '@/db/queries/deck-queries';
+import { getTodayStudySessionCount } from '@/db/queries/study-session-queries';
 import { DeckHeader } from './deck-header';
 import { CardsList } from './cards-list';
 import { AddCardButton } from './add-card-button';
+
+const DAILY_STUDY_SESSION_LIMIT = 40;
 
 interface DeckPageProps {
   params: Promise<{ deckId: string }>;
@@ -29,6 +32,16 @@ export default async function DeckPage({ params }: DeckPageProps) {
     notFound();
   }
 
+  // Get study session info for free users
+  const { has } = await auth();
+  const hasUnlimited = has({ feature: 'unlimited_study_sessions' });
+  let remainingSessions: number | undefined = undefined;
+  
+  if (!hasUnlimited) {
+    const todayCount = await getTodayStudySessionCount(userId);
+    remainingSessions = Math.max(0, DAILY_STUDY_SESSION_LIMIT - todayCount);
+  }
+
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
       {/* Deck Header with title, description, and actions */}
@@ -40,6 +53,8 @@ export default async function DeckPage({ params }: DeckPageProps) {
           createdAt: deck.createdAt,
         }}
         cardCount={deck.cards.length}
+        remainingSessions={remainingSessions}
+        sessionLimit={!hasUnlimited ? DAILY_STUDY_SESSION_LIMIT : undefined}
       />
 
       {/* Cards Section */}

@@ -6,9 +6,10 @@ import { getUserDecks } from "@/db/queries/deck-queries";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { CreateDeckButton } from "./create-deck-button";
 import { DeletionAlert } from "./deletion-alert";
+import { DeckLimitDisplay } from "./deck-limit-display";
 
 export default async function DashboardPage() {
-  const { userId } = await auth();
+  const { userId, has } = await auth();
 
   // Redirect to home if not authenticated
   if (!userId) {
@@ -17,6 +18,11 @@ export default async function DashboardPage() {
 
   // Fetch user's decks using query function
   const decks = await getUserDecks(userId);
+  
+  // Check if user has unlimited decks feature
+  const hasUnlimitedDecks = has({ feature: 'unlimited_decks' });
+  const deckLimit = hasUnlimitedDecks ? null : 3;
+  const canCreateDeck = hasUnlimitedDecks || decks.length < 3;
 
   return (
     <>
@@ -35,10 +41,16 @@ export default async function DashboardPage() {
 
         {/* Action Bar */}
         <div className="mb-8 flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
-            {decks.length} {decks.length === 1 ? "deck" : "decks"}
-          </div>
-          <CreateDeckButton />
+          <DeckLimitDisplay
+            currentCount={decks.length}
+            limit={deckLimit}
+            hasUnlimited={hasUnlimitedDecks}
+          />
+          <CreateDeckButton 
+            canCreateDeck={canCreateDeck}
+            currentDeckCount={decks.length}
+            deckLimit={deckLimit}
+          />
         </div>
 
         {/* Decks Grid */}
@@ -64,7 +76,11 @@ export default async function DashboardPage() {
               <p className="text-muted-foreground text-center mb-6 max-w-md">
                 Get started by creating your first flashcard deck. Build custom decks for any subject you want to master.
               </p>
-              <CreateDeckButton />
+              <CreateDeckButton 
+                canCreateDeck={canCreateDeck}
+                currentDeckCount={decks.length}
+                deckLimit={deckLimit}
+              />
             </CardContent>
           </Card>
         ) : (

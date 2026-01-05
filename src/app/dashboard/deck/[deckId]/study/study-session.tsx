@@ -24,6 +24,7 @@ import {
   Keyboard
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { startStudySessionAction } from '@/app/actions/study-session-actions';
 
 interface StudyCard {
   id: number;
@@ -58,6 +59,7 @@ export function StudySession({ deckId, deckName, cards }: StudySessionProps) {
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const hasMarkedUnanswered = useRef(false);
+  const sessionRecorded = useRef(false);
 
   const currentCard = shuffledCards[currentIndex];
   const progress = ((currentIndex + 1) / shuffledCards.length) * 100;
@@ -102,7 +104,19 @@ export function StudySession({ deckId, deckName, cards }: StudySessionProps) {
     handleNext();
   };
 
-  const handleShuffle = () => {
+  const handleShuffle = async () => {
+    // Record a new study session when user clicks "Shuffle & Study Again"
+    const result = await startStudySessionAction(deckId);
+    
+    if (!result.success) {
+      // If limit reached, redirect to deck page
+      router.push(`/dashboard/deck/${deckId}`);
+      return;
+    }
+    
+    // Dispatch event to update the counter
+    window.dispatchEvent(new CustomEvent('study-session-recorded'));
+    
     const newShuffled = shuffleArray(cards);
     setShuffledCards(newShuffled);
     setCurrentIndex(0);
@@ -116,6 +130,17 @@ export function StudySession({ deckId, deckName, cards }: StudySessionProps) {
   const handleExit = () => {
     router.push(`/dashboard/deck/${deckId}`);
   };
+
+  // Record study session when component mounts
+  useEffect(() => {
+    if (!sessionRecorded.current) {
+      startStudySessionAction(deckId).then(() => {
+        // Dispatch event to update the counter
+        window.dispatchEvent(new CustomEvent('study-session-recorded'));
+      }).catch(console.error);
+      sessionRecorded.current = true;
+    }
+  }, [deckId]);
 
   // Check if keyboard shortcuts dialog should be shown
   useEffect(() => {

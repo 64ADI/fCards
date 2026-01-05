@@ -24,9 +24,21 @@ type UpdateDeckInput = z.infer<typeof updateDeckSchema>;
 
 export async function createDeckAction(input: CreateDeckInput) {
   // Authenticate
-  const { userId } = await auth();
+  const { userId, has } = await auth();
   if (!userId) {
     throw new Error("Unauthorized");
+  }
+  
+  // Check if user has unlimited decks feature
+  const hasUnlimited = has({ feature: 'unlimited_decks' });
+  
+  if (!hasUnlimited) {
+    // Check current deck count
+    const { getUserDecks } = await import('@/db/queries/deck-queries');
+    const userDecks = await getUserDecks(userId);
+    if (userDecks.length >= 3) {
+      throw new Error("Deck limit reached. Upgrade to Pro for unlimited decks.");
+    }
   }
   
   // Validate input with Zod

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2, Play } from 'lucide-react';
+import { StudySessionCounter } from '@/components/study-session-counter';
 import { EditDeckDialog } from './edit-deck-dialog';
 import { DeleteDeckDialog } from './delete-deck-dialog';
 
@@ -16,9 +17,11 @@ interface DeckHeaderProps {
     createdAt: Date;
   };
   cardCount: number;
+  remainingSessions?: number;
+  sessionLimit?: number;
 }
 
-export function DeckHeader({ deck, cardCount }: DeckHeaderProps) {
+export function DeckHeader({ deck, cardCount, remainingSessions, sessionLimit }: DeckHeaderProps) {
   const router = useRouter();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -59,8 +62,8 @@ export function DeckHeader({ deck, cardCount }: DeckHeaderProps) {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-lg border border-primary/20">
                 <svg 
                   className="w-5 h-5 text-primary" 
@@ -82,6 +85,13 @@ export function DeckHeader({ deck, cardCount }: DeckHeaderProps) {
                   {cardCount === 1 ? 'card' : 'cards'}
                 </span>
               </div>
+              {remainingSessions !== undefined && sessionLimit !== undefined && (
+                <StudySessionCounter 
+                  remaining={remainingSessions} 
+                  limit={sessionLimit}
+                  compact
+                />
+              )}
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <svg 
                   className="w-4 h-4" 

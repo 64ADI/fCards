@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -11,7 +12,13 @@ import { Plus, Loader2 } from 'lucide-react';
 import { createDeckAction } from '@/app/actions/deck-actions';
 import { toast } from 'sonner';
 
-export function CreateDeckButton() {
+interface CreateDeckButtonProps {
+  canCreateDeck: boolean;
+  currentDeckCount: number;
+  deckLimit: number | null;
+}
+
+export function CreateDeckButton({ canCreateDeck, currentDeckCount, deckLimit }: CreateDeckButtonProps) {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
@@ -55,10 +62,34 @@ export function CreateDeckButton() {
 
   if (!mounted) {
     return (
-      <Button size="lg" className="gap-2" onClick={() => setOpen(true)}>
+      <Button 
+        size="lg" 
+        className="gap-2" 
+        onClick={() => setOpen(true)}
+        disabled={!canCreateDeck}
+      >
         <Plus className="h-5 w-5" />
         Create New Deck
       </Button>
+    );
+  }
+
+  // If limit reached, show disabled button with upgrade message
+  if (!canCreateDeck && deckLimit !== null) {
+    return (
+      <div className="flex flex-col items-end gap-2">
+        <Button size="lg" className="gap-2" disabled>
+          <Plus className="h-5 w-5" />
+          Create New Deck
+        </Button>
+        <p className="text-sm text-muted-foreground text-right">
+          Deck limit reached ({currentDeckCount}/{deckLimit}).{' '}
+          <Link href="/pricing" className="text-primary hover:underline font-medium">
+            Upgrade to Pro
+          </Link>
+          {' '}for unlimited decks.
+        </p>
+      </div>
     );
   }
 

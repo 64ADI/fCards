@@ -19,3 +19,11 @@ export const cardsTable = pgTable("cards", {
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp().defaultNow().notNull(),
 });
+
+// Study sessions table - tracks study sessions for rate limiting
+export const studySessionsTable = pgTable("study_sessions", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  userId: varchar({ length: 255 }).notNull(), // Clerk user ID
+  deckId: integer().notNull().references(() => decksTable.id, { onDelete: "cascade" }),
+  createdAt: timestamp().defaultNow().notNull(),
+});
