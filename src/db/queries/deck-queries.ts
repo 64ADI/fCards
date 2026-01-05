@@ -1,5 +1,5 @@
 import { db } from '@/db';
-import { decksTable } from '@/db/schema';
+import { decksTable, cardsTable } from '@/db/schema';
 import { eq, desc, and } from 'drizzle-orm';
 
 // Fetch all decks for a user
@@ -64,3 +64,31 @@ export async function deleteDeck(deckId: number, userId: string) {
     );
 }
 
+// Fetch a deck with all its cards (with ownership verification)
+export async function getDeckWithCards(deckId: number, userId: string) {
+  const result = await db.select()
+    .from(decksTable)
+    .leftJoin(cardsTable, eq(cardsTable.deckId, decksTable.id))
+    .where(
+      and(
+        eq(decksTable.id, deckId),
+        eq(decksTable.userId, userId)
+      )
+    )
+    .orderBy(desc(cardsTable.updatedAt), desc(cardsTable.id));
+
+  if (result.length === 0) {
+    return null;
+  }
+
+  // Transform the result into a deck with cards array
+  const deck = result[0].decks;
+  const cards = result
+    .filter(row => row.cards !== null)
+    .map(row => row.cards!);
+
+  return {
+    ...deck,
+    cards,
+  };
+}

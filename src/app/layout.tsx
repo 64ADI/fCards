@@ -10,6 +10,7 @@ import {
 } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { Button} from "@/components/ui/button";
+import { Toaster } from "@/components/ui/sonner";
 import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
@@ -65,6 +66,7 @@ export default function RootLayout({
             </div>
           </header>
           {children}
+          <Toaster position="bottom-right" />
         </body>
       </html>
     </ClerkProvider>
