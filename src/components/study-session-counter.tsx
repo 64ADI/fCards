@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getRemainingStudySessionsAction } from '@/app/actions/study-session-actions';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { StudySessionResetCountdown } from '@/components/study-session-reset-countdown';
 
 interface StudySessionCounterProps {
   remaining?: number; // Optional initial value
@@ -69,7 +71,7 @@ export function StudySessionCounter({
   const isWarning = remaining <= 10;
 
   if (compact) {
-    return (
+    const counterContent = (
       <div className={cn("flex items-center gap-2 px-3 py-1.5 rounded-lg border", 
         isLow ? "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800" : 
         isWarning ? "bg-yellow-50 dark:bg-yellow-950/30 border-yellow-200 dark:border-yellow-800" : 
@@ -88,9 +90,25 @@ export function StudySessionCounter({
         </span>
       </div>
     );
+
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
+          {counterContent}
+        </PopoverTrigger>
+        <PopoverContent 
+          side="top" 
+          className="px-2 py-1.5 text-center w-auto"
+          sideOffset={4}
+          align="center"
+        >
+          <StudySessionResetCountdown />
+        </PopoverContent>
+      </Popover>
+    );
   }
 
-  return (
+  const counterContent = (
     <div className={cn("p-2.5 rounded-lg border bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 border-blue-200 dark:border-blue-800", className)}>
       <div className="flex items-center gap-2.5">
         <BookOpen className={cn(
@@ -118,6 +136,22 @@ export function StudySessionCounter({
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        {counterContent}
+      </PopoverTrigger>
+      <PopoverContent 
+        side="top" 
+        className="px-2 py-1.5 text-center w-auto p-2"
+        sideOffset={4}
+        align="center"
+      >
+        <StudySessionResetCountdown />
+      </PopoverContent>
+    </Popover>
   );
 }
 
