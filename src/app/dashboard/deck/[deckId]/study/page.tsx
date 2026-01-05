@@ -42,3 +42,5 @@ export default async function StudyPage({ params }: StudyPageProps) {
   );
 }
 
+
+

@@ -31,14 +31,14 @@ export function DeckHeader({ deck, cardCount }: DeckHeaderProps) {
     <>
       <Card className="shadow-md">
         <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <CardTitle className="text-3xl mb-2">{deck.name}</CardTitle>
-              <CardDescription className="text-base">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-3xl mb-2 break-words line-clamp-2">{deck.name}</CardTitle>
+              <CardDescription className="text-base break-words line-clamp-3">
                 {deck.description || 'No description'}
               </CardDescription>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-shrink-0">
               <Button
                 variant="outline"
                 size="icon"

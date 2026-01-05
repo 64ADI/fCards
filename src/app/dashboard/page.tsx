@@ -1,9 +1,11 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { Suspense } from "react";
 import { getUserDecks } from "@/db/queries/deck-queries";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { CreateDeckButton } from "./create-deck-button";
+import { DeletionAlert } from "./deletion-alert";
 
 export default async function DashboardPage() {
   const { userId } = await auth();
@@ -17,7 +19,11 @@ export default async function DashboardPage() {
   const decks = await getUserDecks(userId);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
+      <Suspense fallback={null}>
+        <DeletionAlert />
+      </Suspense>
+      <div className="container mx-auto px-4 py-8">
       <div className="max-w-6xl mx-auto">
         {/* Header Section */}
         <div className="mb-8">
@@ -32,22 +38,7 @@ export default async function DashboardPage() {
           <div className="text-sm text-muted-foreground">
             {decks.length} {decks.length === 1 ? "deck" : "decks"}
           </div>
-          <Button size="lg">
-            <svg 
-              className="w-5 h-5 mr-2" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6" 
-              />
-            </svg>
-            Create New Deck
-          </Button>
+          <CreateDeckButton />
         </div>
 
         {/* Decks Grid */}
@@ -73,22 +64,7 @@ export default async function DashboardPage() {
               <p className="text-muted-foreground text-center mb-6 max-w-md">
                 Get started by creating your first flashcard deck. Build custom decks for any subject you want to master.
               </p>
-              <Button>
-                <svg 
-                  className="w-5 h-5 mr-2" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6" 
-                  />
-                </svg>
-                Create Your First Deck
-              </Button>
+              <CreateDeckButton />
             </CardContent>
           </Card>
         ) : (
@@ -152,6 +128,7 @@ export default async function DashboardPage() {
         )}
       </div>
     </div>
+    </>
   );
 }
 

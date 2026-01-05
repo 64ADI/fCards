@@ -8,14 +8,14 @@ import { createDeck, deleteDeck, updateDeck } from '@/db/queries/deck-queries';
 
 // Define Zod schema for validation
 const createDeckSchema = z.object({
-  name: z.string().min(1, "Name is required").max(255),
-  description: z.string().optional(),
+  name: z.string().min(1, "Name is required").max(100, "Name must be 100 characters or less"),
+  description: z.string().max(500, "Description must be 500 characters or less").optional(),
 });
 
 const updateDeckSchema = z.object({
   deckId: z.number(),
-  name: z.string().min(1, "Name is required").max(255).optional(),
-  description: z.string().optional(),
+  name: z.string().min(1, "Name is required").max(100, "Name must be 100 characters or less").optional(),
+  description: z.string().max(500, "Description must be 500 characters or less").optional(),
 });
 
 // Define TypeScript types from Zod schemas
@@ -81,7 +81,7 @@ export async function deleteDeckAction(deckId: number) {
   
   revalidatePath('/dashboard');
   
-  // Redirect to dashboard after deletion
-  redirect('/dashboard');
+  // Return success - let client handle redirect to avoid NEXT_REDIRECT error
+  return { success: true };
 }
 

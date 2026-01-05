@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +26,7 @@ interface DeleteDeckDialogProps {
 export function DeleteDeckDialog({ open, onOpenChange, deckId, deckName }: DeleteDeckDialogProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleDelete = () => {
     setError(null);
@@ -32,8 +34,8 @@ export function DeleteDeckDialog({ open, onOpenChange, deckId, deckName }: Delet
     startTransition(async () => {
       try {
         await deleteDeckAction(deckId);
-        toast.success('Deck deleted successfully!');
-        // The action will redirect to dashboard, so we don't need to close the dialog
+        // Redirect to dashboard with deletion alert parameter
+        router.push('/dashboard?deleted=true');
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to delete deck';
         setError(errorMessage);
