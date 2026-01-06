@@ -5,6 +5,7 @@ import { getTodayStudySessionCount } from '@/db/queries/study-session-queries';
 import { DeckHeader } from './deck-header';
 import { CardsList } from './cards-list';
 import { AddCardButton } from './add-card-button';
+import { GenerateCardsAIButton } from './generate-cards-ai-button';
 
 const DAILY_STUDY_SESSION_LIMIT = 40;
 
@@ -13,7 +14,7 @@ interface DeckPageProps {
 }
 
 export default async function DeckPage({ params }: DeckPageProps) {
-  const { userId } = await auth();
+  const { userId, has } = await auth();
   
   if (!userId) {
     redirect('/');
@@ -33,8 +34,8 @@ export default async function DeckPage({ params }: DeckPageProps) {
   }
 
   // Get study session info for free users
-  const { has } = await auth();
   const hasUnlimited = has({ feature: 'unlimited_study_sessions' });
+  const hasAIFeature = has({ feature: 'ai_flashcard_generation' });
   let remainingSessions: number | undefined = undefined;
   
   if (!hasUnlimited) {
@@ -59,9 +60,17 @@ export default async function DeckPage({ params }: DeckPageProps) {
 
       {/* Cards Section */}
       <div className="mt-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="text-2xl font-semibold">Flashcards</h2>
-          <AddCardButton deckId={deck.id} />
+          <div className="flex items-center gap-3 flex-wrap">
+            <GenerateCardsAIButton 
+              deckId={deck.id} 
+              hasAIFeature={hasAIFeature}
+              deckName={deck.name}
+              deckDescription={deck.description}
+            />
+            <AddCardButton deckId={deck.id} />
+          </div>
         </div>
 
         {deck.cards.length === 0 ? (

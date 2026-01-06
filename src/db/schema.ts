@@ -27,3 +27,11 @@ export const studySessionsTable = pgTable("study_sessions", {
   deckId: integer().notNull().references(() => decksTable.id, { onDelete: "cascade" }),
   createdAt: timestamp().defaultNow().notNull(),
 });
+
+// AI generation requests table - tracks AI flashcard generation for rate limiting
+export const aiGenerationRequestsTable = pgTable("ai_generation_requests", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  userId: varchar({ length: 255 }).notNull(), // Clerk user ID
+  deckId: integer().notNull().references(() => decksTable.id, { onDelete: "cascade" }),
+  createdAt: timestamp().defaultNow().notNull(),
+});
