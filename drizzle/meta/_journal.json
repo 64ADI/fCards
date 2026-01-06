@@ -8,6 +8,13 @@
       "when": 1767638901627,
       "tag": "0000_young_blob",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1767657820421,
+      "tag": "0001_worried_hobgoblin",
+      "breakpoints": true
     }
   ]
 }
