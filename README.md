@@ -19,7 +19,7 @@ You'll need Node.js 18+ and a PostgreSQL database (I use Neon, but any Postgres 
 ### 1. Clone and install
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/64ADI/fCards.git
 cd fcards
 npm install
 ```
