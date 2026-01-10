@@ -1,4 +1,4 @@
-![fCards Logo](public/images/fCards_Logo.png)
+![fCards Logo](public/images/fcardsGithub.png)
 
 # fCards
 
