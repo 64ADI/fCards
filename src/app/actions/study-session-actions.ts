@@ -2,6 +2,7 @@
 
 import { auth } from '@clerk/nextjs/server';
 import { createStudySession, getTodayStudySessionCount } from '@/db/queries/study-session-queries';
+import { getDeckById } from '@/db/queries/deck-queries';
 
 const DAILY_STUDY_SESSION_LIMIT = 40;
 
@@ -18,6 +19,12 @@ export async function startStudySessionAction(deckId: number) {
   
   // Check if user has unlimited study sessions feature
   const hasUnlimited = has({ feature: 'unlimited_study_sessions' });
+  
+  // Security: Verify deck ownership before creating study session
+  const deck = await getDeckById(deckId, userId);
+  if (!deck) {
+    return { success: false, error: "Deck not found or unauthorized" };
+  }
   
   if (!hasUnlimited) {
     // Check current session count for today

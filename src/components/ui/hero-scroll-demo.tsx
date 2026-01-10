@@ -67,14 +67,14 @@ export function HeroScrollDemo({ videoSrc }: { videoSrc?: string }) {
   };
 
   return (
-    <div className="flex flex-col overflow-hidden pb-24 pt-8">
+    <div className="flex flex-col overflow-hidden pb-1 pt-8">
       <ContainerScroll
         titleComponent={
           <>
             <h1 className="text-3xl font-semibold text-black dark:text-white">
               Quick Demo
             </h1>
-            <p className="mt-1 text-lg text-muted-foreground">
+            <p className="mt-0.5 text-lg text-muted-foreground">
               Watch a short demo to get started
             </p>
           </>

@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { generateText } from 'ai';
 import { createHuggingFace } from '@ai-sdk/huggingface';
-import { createCard, deleteCard, updateCard } from '@/db/queries/card-queries';
+import { createCard, deleteCard, updateCard, getCardByIdAndDeckId } from '@/db/queries/card-queries';
 import { getDeckById } from '@/db/queries/deck-queries';
 import { containsInappropriateContent, sanitizeForPrompt, filterInappropriateCards } from '@/lib/content-filter';
 import { getRateLimitConfig, exceedsDailyLimit, exceedsHourlyLimit } from '@/lib/rate-limit-config';
@@ -94,9 +94,16 @@ export async function updateCardAction(input: UpdateCardInput) {
     throw new Error("Deck not found or unauthorized");
   }
   
-  // Call query function to update
+  // Security: Verify that the card belongs to this deck
+  const card = await getCardByIdAndDeckId(validatedData.cardId, validatedData.deckId);
+  if (!card) {
+    throw new Error("Card not found or does not belong to this deck");
+  }
+  
+  // Call query function to update (with deck verification)
   const updatedCard = await updateCard(
     validatedData.cardId,
+    validatedData.deckId,
     {
       front: validatedData.front,
       back: validatedData.back,
@@ -120,8 +127,14 @@ export async function deleteCardAction(cardId: number, deckId: number) {
     throw new Error("Deck not found or unauthorized");
   }
   
-  // Call query function to delete
-  await deleteCard(cardId);
+  // Security: Verify that the card belongs to this deck
+  const card = await getCardByIdAndDeckId(cardId, deckId);
+  if (!card) {
+    throw new Error("Card not found or does not belong to this deck");
+  }
+  
+  // Call query function to delete (with deck verification)
+  await deleteCard(cardId, deckId);
   
   revalidatePath(`/dashboard/deck/${deckId}`);
   
