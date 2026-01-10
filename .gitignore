@@ -43,9 +43,6 @@ next-env.d.ts
 # clerk configuration (can include secrets)
 /.clerk/
 
-# cursor IDE
-/.cursor/
-
 # large files and executables (shouldn't be in version control)
 *.exe
 *.zip

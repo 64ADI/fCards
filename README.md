@@ -1,213 +1,126 @@
-# fCards - Flashcard Learning Platform
+# fCards
 
-A modern, full-stack flashcard application built with Next.js, featuring AI-powered card generation, spaced repetition, and subscription-based access control.
+A flashcard app built with Next.js. Create decks, study with spaced repetition, and generate cards with AI (if you're on the Pro plan).
 
-## 🚀 Features
+## What it does
 
-- **Flashcard Management**: Create, edit, and organize flashcard decks
-- **AI-Powered Generation**: Generate flashcards using Hugging Face AI models (Pro feature)
-- **Study Sessions**: Interactive study sessions with progress tracking
-- **Subscription Tiers**: Free and Pro plans with feature gating via Clerk Billing
-- **User Authentication**: Secure authentication with Clerk
-- **Modern UI**: Beautiful, responsive interface built with shadcn/ui and Tailwind CSS
+- Create and manage flashcard decks
+- Study sessions with progress tracking
+- AI-powered flashcard generation (Pro feature via Hugging Face)
+- Free tier with limits, Pro tier with unlimited everything
+- Authentication handled by Clerk
 
-## 📋 Prerequisites
+## Getting started
 
-Before you begin, ensure you have:
+You'll need Node.js 18+ and a PostgreSQL database (I use Neon, but any Postgres works).
 
-- **Node.js** 18+ installed
-- **npm** or **yarn** package manager
-- **PostgreSQL database** (Neon recommended)
-- **Clerk account** for authentication
-- **Hugging Face account** (for AI features)
-
-## 🛠️ Installation
-
-### Step 1: Clone the Repository
+### 1. Clone and install
 
 ```bash
 git clone <your-repo-url>
 cd fcards
-```
-
-### Step 2: Install Dependencies
-
-```bash
 npm install
 ```
 
-### Step 3: Environment Variables
+### 2. Set up environment variables
 
-Create a `.env.local` file in the root directory:
+Create a `.env.local` file:
 
 ```env
-# Database
 DATABASE_URL=your_postgresql_connection_string
-
-# Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 CLERK_SECRET_KEY=your_clerk_secret_key
-
-# Hugging Face AI (for Pro features)
 HUGGINGFACE_API_KEY=your_huggingface_api_key
 HUGGINGFACE_MODEL=meta-llama/Meta-Llama-3-8B-Instruct
-
-# Next.js
 NEXT_PUBLIC_APP_URL=http://localhost:3001
 ```
 
-**⚠️ Security Note**: Never commit your `.env.local` file. It's already in `.gitignore`.
+Don't commit this file - it's already in `.gitignore`.
 
-### Step 4: Database Setup
+### 3. Set up the database
 
-1. **Push schema to database**:
-   ```bash
-   npm run db:push
-   ```
+Push the schema to your database:
 
-2. **Optional - Open Drizzle Studio** (database GUI):
-   ```bash
-   npm run db:studio
-   ```
+```bash
+npm run db:push
+```
 
-### Step 5: Run Development Server
+If you want to explore the database visually, you can run:
+
+```bash
+npm run db:studio
+```
+
+### 4. Run it
 
 ```bash
 npm run dev
 ```
 
-The application will be available at [http://localhost:3001](http://localhost:3001)
+Open [http://localhost:3001](http://localhost:3001) in your browser.
 
-## 📁 Project Structure
+## Project structure
 
-```
-fcards/
-├── src/
-│   ├── app/                    # Next.js App Router pages
-│   │   ├── actions/           # Server actions
-│   │   ├── dashboard/         # Dashboard pages
-│   │   ├── pricing/           # Pricing page
-│   │   └── page.tsx           # Landing page
-│   ├── components/            # React components
-│   │   └── ui/               # shadcn/ui components
-│   ├── db/                    # Database layer
-│   │   ├── queries/          # Database query functions
-│   │   └── schema.ts         # Drizzle ORM schema
-│   ├── lib/                  # Utility functions
-│   └── middleware.ts         # Next.js middleware
-├── drizzle/                   # Database migrations
-├── public/                    # Static assets
-└── package.json
-```
+Pretty standard Next.js App Router setup:
 
-## 🔧 Available Scripts
+- `src/app/` - Pages and routes
+- `src/app/actions/` - Server actions for mutations
+- `src/components/` - React components (UI stuff in `components/ui/`)
+- `src/db/queries/` - Database query functions
+- `src/db/schema.ts` - Database schema
+- `drizzle/` - Migration files
+
+## Scripts
 
 ```bash
-# Development
-npm run dev          # Start development server (port 3001)
-
-# Production
+npm run dev          # Start dev server (port 3001)
 npm run build        # Build for production
 npm run start        # Start production server
-
-# Database
-npm run db:push      # Push schema changes to database
-npm run db:generate  # Generate migration files
-npm run db:migrate   # Apply migrations
+npm run db:push      # Push schema changes to DB
 npm run db:studio    # Open Drizzle Studio
-
-# Linting
 npm run lint         # Run ESLint
 ```
 
-## 🏗️ Architecture
+## How it works
 
-### Data Flow
+The app follows a pretty straightforward pattern:
 
-1. **Server Components** → Fetch data using query functions
-2. **Client Components** → Display UI and handle interactions
-3. **Server Actions** → Handle mutations (authenticate, validate, call queries)
-4. **Query Functions** → Pure database operations with Drizzle ORM
+1. Server components fetch data using functions in `db/queries/`
+2. Client components handle UI and user interactions
+3. Server actions (in `app/actions/`) handle mutations - they authenticate, validate with Zod, then call the query functions
+4. All database queries filter by `userId` to keep data isolated
 
-### Key Patterns
+Authentication is handled by Clerk middleware, and feature gating uses Clerk Billing to check if users have the right plan/features.
 
-- **Authentication**: All routes protected via Clerk middleware
-- **Data Security**: Every query filters by `userId` to ensure data isolation
-- **Feature Gating**: Uses Clerk Billing to check plan/feature access
-- **Type Safety**: Zod schemas for validation, TypeScript for types
-- **Database**: Drizzle ORM with PostgreSQL (Neon)
+## Tech stack
 
-## 🔐 Security Checklist
+- Next.js 16 (App Router)
+- Clerk (auth + billing)
+- Drizzle ORM (database)
+- shadcn/ui (components)
+- Framer Motion (animations)
+- Tailwind CSS (styling)
 
-✅ All API routes authenticate users  
-✅ All database queries filter by `userId`  
-✅ Environment variables never committed  
-✅ No hardcoded secrets in codebase  
-✅ Server-side validation with Zod  
-✅ User data isolation enforced  
+## Deploying
 
-## 📦 Key Dependencies
+I deploy to Vercel. Just connect your GitHub repo, add the environment variables in the Vercel dashboard, and you're good to go.
 
-- **Next.js 16** - React framework
-- **Clerk** - Authentication & billing
-- **Drizzle ORM** - Type-safe database queries
-- **shadcn/ui** - UI component library
-- **Framer Motion** - Animations
-- **Vercel AI SDK** - AI integration
-- **Tailwind CSS** - Styling
+## Database changes
 
-## 🚢 Deployment
+When you modify the schema in `src/db/schema.ts`:
 
-### Vercel (Recommended)
+1. Update the schema
+2. Run `npm run db:push` (for dev) or `npm run db:generate` (for production migrations)
+3. Commit the migration files in `drizzle/`
 
-1. Push your code to GitHub
-2. Import project in Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy
+## Troubleshooting
 
-### Environment Variables for Production
+**Build errors?** Make sure TypeScript is happy - run `npm run build` to check.
 
-Ensure all environment variables from `.env.local` are set in your deployment platform.
+**Database issues?** Double-check your `DATABASE_URL` and that your database is accessible.
 
-## 📝 Database Migrations
+**Auth not working?** Verify your Clerk keys are correct and the middleware is set up properly.
 
-When modifying the schema:
+## License
 
-1. Update `src/db/schema.ts`
-2. Run `npm run db:push` (development) or `npm run db:generate` (production)
-3. Commit migration files in `drizzle/` directory
-
-## 🐛 Troubleshooting
-
-### Build Errors
-
-- Ensure all TypeScript types are correct
-- Run `npm run build` to check for errors
-- Clear `.next` folder and rebuild if needed
-
-### Database Connection Issues
-
-- Verify `DATABASE_URL` is correct
-- Check database is accessible
-- Ensure SSL mode is set if required
-
-### Authentication Issues
-
-- Verify Clerk keys are correct
-- Check middleware configuration
-- Ensure routes are properly protected
-
-## 📚 Additional Resources
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Clerk Documentation](https://clerk.com/docs)
-- [Drizzle ORM Documentation](https://orm.drizzle.team)
-- [shadcn/ui Components](https://ui.shadcn.com)
-
-## 📄 License
-
-This project is private and proprietary.
-
----
-
-**Built with ❤️ using Next.js, Clerk, and Drizzle ORM**
+MIT License - see [LICENSE](LICENSE) for details.
