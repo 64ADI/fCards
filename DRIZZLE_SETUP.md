@@ -26,8 +26,10 @@ fcards/
 Database URL is configured in `.env`:
 
 ```env
-DATABASE_URL=postgresql://neondb_owner:npg_90RWCsXmUPEA@ep-crimson-breeze-ag63duty-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require
+DATABASE_URL=your_database_connection_string_here
 ```
+
+**⚠️ Security Note:** Never commit your `.env` file or expose your database credentials. The `.env` file is already in `.gitignore`.
 
 ## 📦 Installed Packages
 

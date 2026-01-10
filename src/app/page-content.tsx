@@ -23,11 +23,12 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.22, 1, 0.36, 1],
-    },
   },
+};
+
+const itemTransition = {
+  duration: 0.6,
+  ease: "easeOut" as const,
 };
 
 export function PageContent() {
@@ -38,21 +39,23 @@ export function PageContent() {
       initial="hidden"
       animate="visible"
     >
-      <motion.div className="max-w-3xl mx-auto text-center" variants={itemVariants}>
+      <motion.div className="max-w-3xl mx-auto text-center" variants={itemVariants} transition={itemTransition}>
         <motion.h1
           className="text-4xl md:text-6xl font-bold mb-6"
           variants={itemVariants}
+          transition={itemTransition}
         >
           Master Any Subject with Flashcards
         </motion.h1>
         <motion.p
           className="text-xl text-muted-foreground mb-8"
           variants={itemVariants}
+          transition={itemTransition}
         >
           Create, study, and track your progress with intelligent flashcard decks
         </motion.p>
 
-        <motion.div className="space-y-4" variants={itemVariants}>
+        <motion.div className="space-y-4" variants={itemVariants} transition={itemTransition}>
           <p className="text-lg text-muted-foreground flex items-center justify-center gap-2 flex-wrap">
             <SignUpButton mode="modal">
               <Button variant="default" size="sm">Sign up</Button>
@@ -62,10 +65,10 @@ export function PageContent() {
         </motion.div>
 
         {/* Demo + product summary below the hero */}
-        <motion.div variants={itemVariants}>
+        <motion.div variants={itemVariants} transition={itemTransition}>
           <HeroScrollDemo />
         </motion.div>
-        <motion.div variants={itemVariants}>
+        <motion.div variants={itemVariants} transition={itemTransition}>
           <FeatureStepsDemo />
         </motion.div>
       </motion.div>
@@ -73,6 +76,7 @@ export function PageContent() {
       <motion.section
         className="mt-10 max-w-5xl mx-auto text-left px-4"
         variants={itemVariants}
+        transition={itemTransition}
       >
         <h2 className="text-2xl font-semibold mb-3">Learn faster with flashcards</h2>
         <p className="text-muted-foreground mb-6">

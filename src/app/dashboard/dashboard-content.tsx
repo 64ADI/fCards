@@ -34,11 +34,12 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.22, 1, 0.36, 1],
-    },
   },
+};
+
+const itemTransition = {
+  duration: 0.5,
+  ease: "easeOut" as const,
 };
 
 const cardVariants = {
@@ -46,11 +47,12 @@ const cardVariants = {
   visible: {
     opacity: 1,
     scale: 1,
-    transition: {
-      duration: 0.4,
-      ease: [0.22, 1, 0.36, 1],
-    },
   },
+};
+
+const cardTransition = {
+  duration: 0.4,
+  ease: "easeOut" as const,
 };
 
 export function DashboardContent({
@@ -68,7 +70,7 @@ export function DashboardContent({
     >
       <div className="max-w-6xl mx-auto">
         {/* Header Section */}
-        <motion.div className="mb-8" variants={itemVariants}>
+        <motion.div className="mb-8" variants={itemVariants} transition={itemTransition}>
           <h1 className="text-4xl font-bold mb-2">My Decks</h1>
           <p className="text-muted-foreground">
             Manage and study your flashcard decks
@@ -79,6 +81,7 @@ export function DashboardContent({
         <motion.div
           className="mb-8 flex items-center justify-between"
           variants={itemVariants}
+          transition={itemTransition}
         >
           <DeckLimitDisplay
             currentCount={decks.length}
@@ -131,7 +134,7 @@ export function DashboardContent({
             variants={containerVariants}
           >
             {decks.map((deck, index) => (
-              <motion.div key={deck.id} variants={cardVariants}>
+              <motion.div key={deck.id} variants={cardVariants} transition={cardTransition}>
                 <Link href={`/dashboard/deck/${deck.id}`}>
                   <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
                     <CardHeader>
