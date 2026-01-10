@@ -17,6 +17,7 @@ import Footer from "@/components/footer";
 import "./globals.css";
 import Providers from "@/components/providers";
 import { DefaultToggle } from "@/components/default-toggle";
+import { Analytics } from "@vercel/analytics/next";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -88,6 +89,7 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
           <Toaster position="bottom-right" />
+          <Analytics />
           </Providers>
         </body>
       </html>

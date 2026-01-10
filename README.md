@@ -4,6 +4,8 @@
 
 A flashcard app built with Next.js. Create decks, study with spaced repetition, and generate cards with AI (if you're on the Pro plan).
 
+**Live Demo:** [https://fcards-eight.vercel.app/](https://fcards-eight.vercel.app/)
+
 ## What it does
 
 - Create and manage flashcard decks
