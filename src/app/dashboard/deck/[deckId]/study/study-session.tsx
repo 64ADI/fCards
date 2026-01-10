@@ -36,6 +36,7 @@ interface StudySessionProps {
   deckId: number;
   deckName: string;
   cards: StudyCard[];
+  sessionStarted?: boolean; // true when server already created the session
 }
 
 // Fisher-Yates shuffle algorithm
@@ -48,7 +49,7 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
-export function StudySession({ deckId, deckName, cards }: StudySessionProps) {
+export function StudySession({ deckId, deckName, cards, sessionStarted = false }: StudySessionProps) {
   const router = useRouter();
   const [shuffledCards, setShuffledCards] = useState<StudyCard[]>(() => shuffleArray(cards));
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -131,16 +132,31 @@ export function StudySession({ deckId, deckName, cards }: StudySessionProps) {
     router.push(`/dashboard/deck/${deckId}`);
   };
 
-  // Record study session when component mounts
+  // Record study session when component mounts (skip if server already started it)
   useEffect(() => {
-    if (!sessionRecorded.current) {
-      startStudySessionAction(deckId).then(() => {
-        // Dispatch event to update the counter
-        window.dispatchEvent(new CustomEvent('study-session-recorded'));
-      }).catch(console.error);
+    if (sessionStarted) {
+      // Server already created the session; mark recorded and notify counters
       sessionRecorded.current = true;
+      window.dispatchEvent(new CustomEvent('study-session-recorded'));
+      return;
     }
-  }, [deckId]);
+
+    if (!sessionRecorded.current) {
+      startStudySessionAction(deckId)
+        .then((result) => {
+          // If start was blocked (limit reached), redirect back to deck
+          if (!result || !result.success) {
+            router.push(`/dashboard/deck/${deckId}`);
+            return;
+          }
+
+          // Only dispatch event when session actually recorded
+          window.dispatchEvent(new CustomEvent('study-session-recorded'));
+          sessionRecorded.current = true;
+        })
+        .catch(console.error);
+    }
+  }, [deckId, router, sessionStarted]);
 
   // Check if keyboard shortcuts dialog should be shown
   useEffect(() => {

@@ -85,13 +85,6 @@ export function DeckHeader({ deck, cardCount, remainingSessions, sessionLimit }:
                   {cardCount === 1 ? 'card' : 'cards'}
                 </span>
               </div>
-              {remainingSessions !== undefined && sessionLimit !== undefined && (
-                <StudySessionCounter 
-                  remaining={remainingSessions} 
-                  limit={sessionLimit}
-                  compact
-                />
-              )}
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <svg 
                   className="w-4 h-4" 
@@ -107,6 +100,17 @@ export function DeckHeader({ deck, cardCount, remainingSessions, sessionLimit }:
                   />
                 </svg>
                 <span>Created {new Date(deck.createdAt).toLocaleDateString()}</span>
+                {remainingSessions !== undefined && sessionLimit !== undefined && (
+                  <span className="ml-3">
+                    <StudySessionCounter 
+                      remaining={remainingSessions} 
+                      limit={sessionLimit}
+                      autoRefresh
+                      compact
+                      className="px-2 py-1"
+                    />
+                  </span>
+                )}
               </div>
             </div>
             <Button 
