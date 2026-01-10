@@ -1,6 +1,4 @@
-<div align="center">
-  <img src="public/images/fCards_Logo.png" alt="fCards Logo" width="300">
-</div>
+![fCards Logo](public/images/fCards_Logo.png)
 
 # fCards
 
