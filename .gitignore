@@ -47,6 +47,5 @@ next-env.d.ts
 *.exe
 *.zip
 *.mp3
-*.mp4
 *.mov
 *.avi
