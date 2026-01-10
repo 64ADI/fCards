@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="public/images/fCards_Logo.png" alt="fCards Logo" width="300">
+</div>
+
 # fCards
 
 A flashcard app built with Next.js. Create decks, study with spaced repetition, and generate cards with AI (if you're on the Pro plan).
@@ -54,7 +58,7 @@ npm run db:studio
 npm run dev
 ```
 
-Open [http://localhost:3001](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Project structure
 
